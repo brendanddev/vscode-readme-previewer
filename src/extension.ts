@@ -5,10 +5,7 @@
  */
 
 import * as vscode from 'vscode';
-import MarkdownIt from 'markdown-it';
-
-
-const markdownParser = new MarkdownIt();
+import { updateWebViewContent } from './previewer';
 
 
 /**
