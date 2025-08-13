@@ -2,6 +2,8 @@
 
 A Visual Studio Code extension that allows you to **preview README.md files inline** directly within VS Code — no switching to a browser required.
 
+---
+
 ## Features
 
 - **Inline Preview**: View your README.md files in a side panel without leaving the editor.
@@ -10,3 +12,12 @@ A Visual Studio Code extension that allows you to **preview README.md files inli
 - **Live Preview**: Automatically updates the preview as you save changes to the README.md file.
 - **Live Theme Update**: Automatically updates the preview when the VS Code theme changes between dark and light modes.
 - **Code & Tables Styling**: Proper rendering and styling for code blocks, tables, blockquotes, and other Markdown elements.
+- **Customizable Settings**: Adjust settings for the previewer via VS Code's settings UI.
+- **Keybinding Support**: Easily trigger the preview with a customizable keybinding.
+
+---
+
+## Usage
+
+
+
