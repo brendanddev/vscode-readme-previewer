@@ -88,33 +88,3 @@ export function activate(context: vscode.ExtensionContext) {
  */
 export function deactivate() {}
 
-/**
- * Updates the content of the webview panel
- * 
- * @param panel The webview panel to update
- * @param content The content to set in the webview
- */
-const updateWebViewContent = async (panel: vscode.WebviewPanel, content: string) => {
-	try {
-		const htmlContent = markdownParser.render(content);
-		const css = getThemeCSS();
-
-		// Set the HTML content of the webview
-		panel.webview.html = `
-			<!DOCTYPE html>
-			<html lang="en">
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>README Preview</title>
-				<style>${css}</style>
-			</head>
-			<body>
-				${htmlContent}
-			</body>
-			</html>
-		`;
-	} catch (error) {
-		vscode.window.showErrorMessage('Error updating webview content!');
-	}
-};
