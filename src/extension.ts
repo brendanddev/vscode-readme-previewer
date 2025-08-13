@@ -8,6 +8,9 @@ import * as vscode from 'vscode';
 import { updateWebViewContent } from './previewer';
 import { COMMANDS, PreviewPanelState } from './types';
 
+// To keep track of the active webview panel and its state
+let activePanel: vscode.WebviewPanel | undefined;
+let activeReadmeUri: vscode.Uri | undefined;
 
 /**
  * Called when the extension is activated
@@ -44,6 +47,10 @@ export function activate(context: vscode.ExtensionContext) {
                 disposables: []
             };
 
+			// Track the active panel and README URI for live updates
+			activePanel = panelState.panel;
+			activeReadmeUri = readmeUri;
+
             // Update content initially
             updateWebViewContent(panelState.panel, markdownString);
 
@@ -69,6 +76,8 @@ export function activate(context: vscode.ExtensionContext) {
 
             // Dispose resources when panel closes
             panelState.panel.onDidDispose(() => {
+				activePanel = undefined;
+    			activeReadmeUri = undefined;
                 panelState.watcher.dispose();
                 panelState.disposables.forEach(d => d.dispose());
             });
@@ -76,7 +85,38 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showErrorMessage('Could not open README.md!');
         }
     });
-    context.subscriptions.push(helloWorldDisposable, previewDisposable);
+
+	// Pick colors command
+	const pickColorsDisposable = vscode.commands.registerCommand('vscode-readme-previewer.pickColors', async () => {
+		
+		// Prompt user for text color
+		const text = await vscode.window.showInputBox({
+			prompt: 'Pick text color (hex, e.g., #333333)',
+			placeHolder: '#000000'
+		});
+		if (!text) return;
+
+		// Prompt user for background color
+		const bg = await vscode.window.showInputBox({
+            prompt: 'Pick background color (hex, e.g., #ffcccc)',
+            placeHolder: '#ffffff'
+        });
+        if (!bg) return;
+
+		// Save to workspace configuration
+        const config = vscode.workspace.getConfiguration('readmePreviewer');
+        await config.update('backgroundColor', bg, vscode.ConfigurationTarget.Global);
+        await config.update('textColor', text, vscode.ConfigurationTarget.Global);
+
+		// Find the open preview panel (if any) and update it
+        vscode.window.visibleTextEditors.forEach(editor => {
+            // you can also track your panelState and updateWebViewContent(panelState.panel, markdownString)
+        });
+
+		vscode.window.showInformationMessage(`Theme updated! Background: ${bg}, Text: ${text}`);
+	});
+	
+	context.subscriptions.push(helloWorldDisposable, previewDisposable, pickColorsDisposable);
 }
 
 
