@@ -63,9 +63,15 @@ export function activate(context: vscode.ExtensionContext) {
 					updateWebViewContent(panel, updatedContent);
 				});
 
+				// Update the webview content when the active color theme changes
+				const themeListener = vscode.window.onDidChangeActiveColorTheme(() => {
+					updateWebViewContent(panel, markdownString);
+				});
+
 				// Dispose watcher when the panel is closed
 				panel.onDidDispose(() => {
 					watcher.dispose();
+					themeListener.dispose();
 				});
 
 			} catch (error) {
@@ -91,6 +97,9 @@ export function deactivate() {}
 const updateWebViewContent = async (panel: vscode.WebviewPanel, content: string) => {
 	try {
 		const htmlContent = markdownParser.render(content);
+		const css = getThemeCSS();
+
+		// Set the HTML content of the webview
 		panel.webview.html = `
 			<!DOCTYPE html>
 			<html lang="en">
@@ -98,6 +107,7 @@ const updateWebViewContent = async (panel: vscode.WebviewPanel, content: string)
 				<meta charset="UTF-8">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<title>README Preview</title>
+				<style>${css}</style>
 			</head>
 			<body>
 				${htmlContent}
