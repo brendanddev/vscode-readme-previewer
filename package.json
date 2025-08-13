@@ -14,6 +14,10 @@
   "contributes": {
     "commands": [
       {
+        "command": "vscode-readme-previewer.previewReadMe",
+        "title": "Preview README"
+      },
+      {
         "command": "vscode-readme-previewer.helloWorld",
         "title": "Hello World"
       }
