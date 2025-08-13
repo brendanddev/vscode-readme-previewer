@@ -37,7 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 				const readmeContent = await vscode.workspace.fs.readFile(readmeUri);
 				const markdownString = new TextDecoder().decode(readmeContent);
 
-
 				// Create and show a new webview panel
 				const panel = vscode.window.createWebviewPanel(
 					'readmePreview',
@@ -65,10 +64,18 @@ export function activate(context: vscode.ExtensionContext) {
 					updateWebViewContent(panel, markdownString);
 				});
 
-				// Dispose watcher when the panel is closed
+				// Update the webview content when user changes settings
+				const configListener = vscode.workspace.onDidChangeConfiguration(e => {
+					if (e.affectsConfiguration('readmePreviewer')) {
+						updateWebViewContent(panel, markdownString);
+					}
+				});
+
+				// Dispose watcher and listeners when the panel is closed
 				panel.onDidDispose(() => {
 					watcher.dispose();
 					themeListener.dispose();
+					configListener.dispose();
 				});
 
 			} catch (error) {

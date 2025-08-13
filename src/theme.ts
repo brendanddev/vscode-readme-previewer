@@ -12,31 +12,43 @@ import * as vscode from 'vscode';
  * @returns {string} The CSS string to apply to the webview
  */
 export const getThemeCSS = (): string => {
-	const isDark = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark;
+    
+    // Get configuration for the readmePreviewer extension
+    const config = vscode.workspace.getConfiguration('readmePreviewer');
+
+    // Get user defined colors from settings
+    const userBg = config.get<string>('backgroundColor', '');
+    const userText = config.get<string>('textColor', '');
+
+    // Check for dark theme
+    const isDark = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark;
+
+    // Return CSS string based on the theme and user settings
+    // Fallback to default colors if user settings are not defined
 	return `
-		body {
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-			padding: 16px;
-			background-color: ${isDark ? '#1e1e1e' : '#ffffff'};
-			color: ${isDark ? '#d4d4d4' : '#000000'};
-		}
-		pre {
-			background-color: ${isDark ? '#252526' : '#f3f3f3'};
-			padding: 8px;
-			border-radius: 4px;
-			overflow-x: auto;
-		}
-		blockquote {
-			border-left: 4px solid ${isDark ? '#555' : '#ccc'};
-			padding-left: 8px;
-			color: ${isDark ? '#999' : '#555'};
-		}
-		table {
-			border-collapse: collapse;
-		}
-		th, td {
-			border: 1px solid ${isDark ? '#555' : '#ccc'};
-			padding: 4px 8px;
-		}
-	`;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+            background-color: ${userBg || (isDark ? '#1e1e1e' : '#ffffff')};
+            color: ${userText || (isDark ? '#d4d4d4' : '#000000')};
+            }
+        pre {
+            background-color: ${isDark ? '#252526' : '#f3f3f3'};
+            padding: 8px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        blockquote {
+            border-left: 4px solid ${isDark ? '#555' : '#ccc'};
+            padding-left: 8px;
+            color: ${isDark ? '#999' : '#555'};
+        }
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid ${isDark ? '#555' : '#ccc'};
+            padding: 4px 8px;
+        }
+  `;
 };
