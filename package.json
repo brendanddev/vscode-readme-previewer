@@ -22,8 +22,8 @@
         "title": "Hello World"
       },
       {
-        "command": "vscode-readme-previewer.pickColors",
-        "title": "Pick README Preview Colors"
+        "command": "vscode-readme-previewer.colorPicker",
+        "title": "Open README Preview Color Picker"
       }
     ],
     "keybindings": [
@@ -40,6 +40,17 @@
           "command": "vscode-readme-previewer.previewReadMe",
           "when": "resourceExtname == '.md'",
           "group": "navigation"
+        },
+        {
+          "command": "vscode-readme-previewer.colorPicker",
+          "when": "resourceExtname == '.md'",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vscode-readme-previewer.colorPicker",
+          "when": "true"
         }
       ]
     },

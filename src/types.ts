@@ -47,4 +47,5 @@ export interface PreviewPanelState {
 export const COMMANDS = {
     HELLO_WORLD: 'vscode-readme-previewer.helloWorld',
     PREVIEW_README: 'vscode-readme-previewer.previewReadMe',
+    COLOR_PICKER: 'vscode-readme-previewer.colorPicker',
 } as const;
