@@ -20,6 +20,10 @@
       {
         "command": "vscode-readme-previewer.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "vscode-readme-previewer.pickColors",
+        "title": "Pick README Preview Colors"
       }
     ],
     "keybindings": [
