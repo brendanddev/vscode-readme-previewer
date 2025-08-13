@@ -22,6 +22,14 @@
         "title": "Hello World"
       }
     ],
+    "keybindings": [
+      {
+        "command": "vscode-readme-previewer.previewReadMe",
+        "key": "ctrl+alt+r",
+        "mac": "cmd+shift+r",
+        "when": "editorTextFocus && resourceExtname == '.md'"
+      }
+    ],
     "menus": {
       "editor/title": [
         {
