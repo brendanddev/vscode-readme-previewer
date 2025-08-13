@@ -30,6 +30,22 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "README Previewer Settings",
+      "properties": {
+        "readmePreviewer.backgroundColor": {
+          "type": "string",
+          "default": "",
+          "description": "Background color for README preview. Leave empty to follow VS Code theme."
+        },
+        "readmePreviewer.textColor": {
+          "type": "string",
+          "default": "",
+          "description": "Text color for README preview. Leave empty to follow VS Code theme."
+        }
+      }
     }
   },
   "scripts": {
