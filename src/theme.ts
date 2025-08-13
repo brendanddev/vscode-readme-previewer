@@ -5,6 +5,7 @@
  */
 
 import * as vscode from 'vscode';
+import { ReadmePreviewerConfig, CONFIG_SECTION } from './types';
 
 /**
  * Generates CSS for the webview based on the current VS Code theme
@@ -12,15 +13,11 @@ import * as vscode from 'vscode';
  * @returns {string} The CSS string to apply to the webview
  */
 export const getThemeCSS = (): string => {
-    
-    // Get configuration for the readmePreviewer extension
-    const config = vscode.workspace.getConfiguration('readmePreviewer');
 
-    // Get user defined colors from settings
-    const userBg = config.get<string>('backgroundColor', '');
-    const userText = config.get<string>('textColor', '');
-
-    // Check for dark theme
+    // Get configuration from settings
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION) as unknown as ReadmePreviewerConfig;
+    const userBg = config.backgroundColor || '';
+    const userText = config.textColor || '';
     const isDark = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark;
 
     // Return CSS string based on the theme and user settings

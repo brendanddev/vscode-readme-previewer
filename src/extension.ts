@@ -6,6 +6,7 @@
 
 import * as vscode from 'vscode';
 import { updateWebViewContent } from './previewer';
+import { COMMANDS, PreviewPanelState } from './types';
 
 
 /**
@@ -17,75 +18,67 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('Activating extension "vscode-readme-previewer"...');
 
 	// Hello World command
-	const helloWorldDisposable = vscode.commands.registerCommand('vscode-readme-previewer.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from vscode-readme-previewer!');
-	});
+	const helloWorldDisposable = vscode.commands.registerCommand(COMMANDS.HELLO_WORLD, () => {
+        vscode.window.showInformationMessage('Hello World!');
+    });
 
 	// Preview README command
-	const previewReadMeDisposable = vscode.commands.registerCommand(
-		'vscode-readme-previewer.previewReadMe', 
-		async () => {
-			if (!vscode.workspace.workspaceFolders) {
-				vscode.window.showErrorMessage('No workspace folder is open. Please open a folder to preview README.md.');
-				return;
-			}
-			
-			const readmeUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, 'README.md');	
-	
-			try {
-				// Fetch README.md content from workspace
-				const readmeContent = await vscode.workspace.fs.readFile(readmeUri);
-				const markdownString = new TextDecoder().decode(readmeContent);
+	const previewDisposable = vscode.commands.registerCommand(COMMANDS.PREVIEW_README, async () => {
+        if (!vscode.workspace.workspaceFolders) {
+            vscode.window.showErrorMessage('Open a folder first!');
+            return;
+        }
 
-				// Create and show a new webview panel
-				const panel = vscode.window.createWebviewPanel(
-					'readmePreview',
-					'README Preview',
-					vscode.ViewColumn.Beside,
-					{ enableScripts: true }
-				);
+        const readmeUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, 'README.md');
 
-				// Set initial content of the webview
-				updateWebViewContent(panel, markdownString);
+        try {
+			// Fetch README.md content from workspace
+			const readmeContent = await vscode.workspace.fs.readFile(readmeUri);
+            const markdownString = new TextDecoder().decode(readmeContent);
 
-				// Create watcher to watch for changes in README file
-				const watcher = vscode.workspace.createFileSystemWatcher(
-					new vscode.RelativePattern(vscode.workspace.workspaceFolders![0], 'README.md')
-				);
+			// Create and show a new webview panel
+            const panelState: PreviewPanelState = {
+                panel: vscode.window.createWebviewPanel('readmePreview', 'README Preview', vscode.ViewColumn.Beside, { enableScripts: true }),
+                readmeUri,
+                watcher: vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], 'README.md')),
+                disposables: []
+            };
 
-				// Update the webview content when README.md changes
-				watcher.onDidChange(async () => {
-					const updatedContent = new TextDecoder().decode(await vscode.workspace.fs.readFile(readmeUri));
-					updateWebViewContent(panel, updatedContent);
-				});
+            // Update content initially
+            updateWebViewContent(panelState.panel, markdownString);
 
-				// Update the webview content when the active color theme changes
-				const themeListener = vscode.window.onDidChangeActiveColorTheme(() => {
-					updateWebViewContent(panel, markdownString);
-				});
+            // Watch file changes
+            panelState.watcher.onDidChange(async () => {
+                const updatedContent = new TextDecoder().decode(await vscode.workspace.fs.readFile(readmeUri));
+                updateWebViewContent(panelState.panel, updatedContent);
+            });
 
-				// Update the webview content when user changes settings
-				const configListener = vscode.workspace.onDidChangeConfiguration(e => {
-					if (e.affectsConfiguration('readmePreviewer')) {
-						updateWebViewContent(panel, markdownString);
-					}
-				});
+			// Listen for theme changes
+			const themeListener = vscode.window.onDidChangeActiveColorTheme(() => {
+				updateWebViewContent(panelState.panel, markdownString);
+			});
+			panelState.disposables.push(themeListener);
 
-				// Dispose watcher and listeners when the panel is closed
-				panel.onDidDispose(() => {
-					watcher.dispose();
-					themeListener.dispose();
-					configListener.dispose();
-				});
+			// Listen for config changes
+			const configListener = vscode.workspace.onDidChangeConfiguration(event => {
+				if (event.affectsConfiguration('readmePreviewer')) {
+					updateWebViewContent(panelState.panel, markdownString);
+				}
+			});
+			panelState.disposables.push(configListener);
 
-			} catch (error) {
-				vscode.window.showErrorMessage('Could not find or open README.md!');
-			}
-		}
-	);
-	// Push both commands to subscriptions
-	context.subscriptions.push(helloWorldDisposable, previewReadMeDisposable);
+            // Dispose resources when panel closes
+            panelState.panel.onDidDispose(() => {
+                panelState.watcher.dispose();
+                panelState.disposables.forEach(d => d.dispose());
+            });
+        } catch (err) {
+            vscode.window.showErrorMessage('Could not open README.md!');
+        }
+    });
+    context.subscriptions.push(helloWorldDisposable, previewDisposable);
 }
+
 
 /**
  * Deactivates the extension
