@@ -40,9 +40,6 @@ export function activate(context: vscode.ExtensionContext) {
 				const readmeContent = await vscode.workspace.fs.readFile(readmeUri);
 				const markdownString = new TextDecoder().decode(readmeContent);
 
-				// Convert markdown to HTML
-				const htmlContent = markdownParser.render(markdownString);
-
 
 				// Create and show a new webview panel
 				const panel = vscode.window.createWebviewPanel(
@@ -52,26 +49,25 @@ export function activate(context: vscode.ExtensionContext) {
 					{ enableScripts: true }
 				);
 
+				// Set initial content of the webview
+				updateWebViewContent(panel, markdownString);
+
 				// Create watcher to watch for changes in README file
-				// and update the webview content accordingly
 				const watcher = vscode.workspace.createFileSystemWatcher(
 					new vscode.RelativePattern(vscode.workspace.workspaceFolders![0], 'README.md')
 				);
 
-				// Set the HTML content of the webview panel
-				panel.webview.html = `
-					<!DOCTYPE html>
-						<html lang="en">
-						<head>
-							<meta charset="UTF-8">
-							<meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<title>README Preview</title>
-						</head>
-						<body>
-							${htmlContent}
-						</body>
-					</html>
-				`;
+				// Update the webview content when README.md changes
+				watcher.onDidChange(async () => {
+					const updatedContent = new TextDecoder().decode(await vscode.workspace.fs.readFile(readmeUri));
+					updateWebViewContent(panel, updatedContent);
+				});
+
+				// Dispose watcher when the panel is closed
+				panel.onDidDispose(() => {
+					watcher.dispose();
+				});
+				
 			} catch (error) {
 				vscode.window.showErrorMessage('Could not find or open README.md!');
 			}
