@@ -48,4 +48,5 @@ export const COMMANDS = {
     HELLO_WORLD: 'vscode-readme-previewer.helloWorld',
     PREVIEW_README: 'vscode-readme-previewer.previewReadMe',
     COLOR_PICKER: 'vscode-readme-previewer.colorPicker',
+    REFRESH_PREVIEW: 'vscode-readme-previewer.refreshPreview',
 } as const;

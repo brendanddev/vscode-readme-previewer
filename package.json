@@ -40,11 +40,6 @@
           "command": "vscode-readme-previewer.previewReadMe",
           "when": "resourceExtname == '.md'",
           "group": "navigation"
-        },
-        {
-          "command": "vscode-readme-previewer.colorPicker",
-          "when": "resourceExtname == '.md'",
-          "group": "navigation"
         }
       ],
       "commandPalette": [
