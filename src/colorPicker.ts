@@ -57,7 +57,6 @@ export function showColorPicker(): void {
 			}
 		}
 	);
-
 	// Clean up when panel is disposed
 	colorPickerPanel.onDidDispose(() => {
 		colorPickerPanel = undefined;
@@ -68,9 +67,9 @@ export function showColorPicker(): void {
  * Creates the status bar item for the color picker
  */
 export function createStatusBarItem(context: vscode.ExtensionContext): void {
-	colorPickerStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+	colorPickerStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 200);
 	colorPickerStatusBarItem.command = 'vscode-readme-previewer.colorPicker';
-	colorPickerStatusBarItem.text = "$(paintbrush)";
+	colorPickerStatusBarItem.text = "🎨 Colors";
 	colorPickerStatusBarItem.tooltip = "Open README Preview Color Picker";
 	colorPickerStatusBarItem.show();
 	context.subscriptions.push(colorPickerStatusBarItem);
