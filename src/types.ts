@@ -16,6 +16,7 @@ export const CONFIG_SECTION = 'readmePreviewer' as const;
 export interface ReadmePreviewerConfig {
     backgroundColor?: string;
     textColor?: string;
+    style?: 'modern' | 'basic';
 }
 
 /**
@@ -49,4 +50,5 @@ export const COMMANDS = {
     PREVIEW_README: 'vscode-readme-previewer.previewReadMe',
     COLOR_PICKER: 'vscode-readme-previewer.colorPicker',
     REFRESH_PREVIEW: 'vscode-readme-previewer.refreshPreview',
+    SWITCH_STYLE: 'vscode-readme-previewer.switchStyle',
 } as const;
