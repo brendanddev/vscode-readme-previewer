@@ -18,6 +18,7 @@ export const getThemeCSS = (): string => {
     const config = vscode.workspace.getConfiguration(CONFIG_SECTION) as unknown as ReadmePreviewerConfig;
     const userBg = config.backgroundColor || '';
     const userText = config.textColor || '';
+    const style = config.style || 'modern';
     const isDark = vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark;
 
     // Define theme colors
@@ -39,6 +40,13 @@ export const getThemeCSS = (): string => {
         shadowHover: isDark ? 'rgba(1, 4, 9, 0.5)' : 'rgba(140, 149, 159, 0.25)'
     };
 
+    return style === 'modern' ? getModernStyleCSS(colors, isDark) : getBasicStyleCSS(colors, isDark);
+};
+
+/**
+ * Generates modern CSS with enhanced styling, animations, and gradients
+ */
+function getModernStyleCSS(colors: any, isDark: boolean): string {
     return `
         .markdown-body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
@@ -428,4 +436,174 @@ export const getThemeCSS = (): string => {
             }
         }
     `;
-};
+}
+
+/**
+ * Generates basic CSS with minimal styling - just plain parsed markdown
+ */
+function getBasicStyleCSS(colors: any, isDark: boolean): string {
+    return `
+        .markdown-body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: ${colors.text};
+            background: ${colors.bg};
+            padding: 16px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Headings - minimal styling */
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3,
+        .markdown-body h4,
+        .markdown-body h5,
+        .markdown-body h6 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: ${colors.text};
+        }
+
+        .markdown-body h1 {
+            font-size: 1.8em;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.5em;
+        }
+
+        .markdown-body h3 {
+            font-size: 1.3em;
+        }
+
+        .markdown-body h4 {
+            font-size: 1.1em;
+        }
+
+        .markdown-body h5 {
+            font-size: 1em;
+        }
+
+        .markdown-body h6 {
+            font-size: 0.9em;
+        }
+
+        /* Paragraphs */
+        .markdown-body p {
+            margin-bottom: 12px;
+        }
+
+        /* Links - just basic color */
+        .markdown-body a {
+            color: ${colors.accent};
+        }
+
+        /* Lists - minimal styling */
+        .markdown-body ul,
+        .markdown-body ol {
+            margin-bottom: 12px;
+            padding-left: 20px;
+        }
+
+        .markdown-body li {
+            margin-bottom: 4px;
+        }
+
+        /* Code blocks - minimal styling */
+        .markdown-body pre {
+            background: ${colors.codeBg};
+            border: 1px solid ${colors.border};
+            padding: 8px;
+            margin: 12px 0;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+
+        .markdown-body code {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            background: ${colors.codeBg};
+            padding: 1px 3px;
+            color: ${colors.text};
+        }
+
+        .markdown-body pre code {
+            background: transparent;
+            padding: 0;
+        }
+
+        /* Blockquotes - minimal styling */
+        .markdown-body blockquote {
+            margin: 12px 0;
+            padding: 8px 12px;
+            border-left: 3px solid ${colors.accent};
+            background: ${colors.bgSecondary};
+            color: ${colors.muted};
+        }
+
+        .markdown-body blockquote p {
+            margin: 0;
+        }
+
+        /* Tables - minimal styling */
+        .markdown-body table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            border: 1px solid ${colors.border};
+        }
+
+        .markdown-body th {
+            background: ${colors.tableHeader};
+            color: ${colors.text};
+            font-weight: 600;
+            padding: 6px 8px;
+            text-align: left;
+            border: 1px solid ${colors.border};
+        }
+
+        .markdown-body td {
+            padding: 6px 8px;
+            border: 1px solid ${colors.border};
+        }
+
+        /* Images */
+        .markdown-body img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Horizontal rules */
+        .markdown-body hr {
+            height: 1px;
+            background: ${colors.border};
+            border: none;
+            margin: 16px 0;
+        }
+
+        /* Task lists */
+        .markdown-body input[type="checkbox"] {
+            margin-right: 6px;
+        }
+
+        /* Definition lists */
+        .markdown-body dl {
+            margin: 12px 0;
+        }
+
+        .markdown-body dt {
+            font-weight: 600;
+            color: ${colors.accent};
+            margin-top: 8px;
+        }
+
+        .markdown-body dd {
+            margin-left: 12px;
+            margin-bottom: 4px;
+            color: ${colors.muted};
+        }
+    `;
+}
