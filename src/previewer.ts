@@ -35,7 +35,9 @@ export const updateWebViewContent = async (panel: vscode.WebviewPanel, content: 
 				<style>${css}</style>
 			</head>
 			<body>
-				${htmlContent}
+				<div class="markdown-body">
+					${htmlContent}
+				</div>
 			</body>
 			</html>
 		`;
