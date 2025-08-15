@@ -14,6 +14,8 @@ A Visual Studio Code extension that allows you to **preview README.md files inli
 - **Code & Tables Styling**: Proper rendering and styling for code blocks, tables, blockquotes, and other Markdown elements.
 - **Customizable Settings**: Adjust settings for the previewer via VS Code's settings UI.
 - **Keybinding Support**: Easily trigger the preview with a customizable keybinding.
+- **Security**: Ensures safe rendering of content with appropriate Content Security Policies.
+- **Modern or Classic UI**: Choose between a modern or classic user interface for the preview panel.
 
 ---
 
