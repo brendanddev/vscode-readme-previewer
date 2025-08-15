@@ -6,12 +6,13 @@
 
 import * as vscode from 'vscode';
 import { updateWebViewContent } from './previewer';
-import { COMMANDS, PreviewPanelState } from './types';
+import { COMMANDS, PreviewPanelState, CONFIG_SECTION } from './types';
 import { showColorPicker, createStatusBarItem, showQuickColorPopup } from './colorPicker';
 
 // To keep track of the active webview panel and its state
 let activePanel: vscode.WebviewPanel | undefined;
 let activeReadmeUri: vscode.Uri | undefined;
+let styleStatusBarItem: vscode.StatusBarItem | undefined;
 
 /**
  * Called when the extension is activated
@@ -23,6 +24,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Create status bar item for color picker
 	createStatusBarItem(context);
+
+	// Create status bar item for style switcher
+	createStyleStatusBarItem(context);
 
 	// Hello World command
 	const helloWorldDisposable = vscode.commands.registerCommand(COMMANDS.HELLO_WORLD, () => {
@@ -77,6 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
 			const configListener = vscode.workspace.onDidChangeConfiguration(event => {
 				if (event.affectsConfiguration('readmePreviewer')) {
 					updateWebViewContent(panelState.panel, markdownString);
+					updateStyleStatusBarText();
 				}
 			});
 			panelState.disposables.push(configListener);
@@ -98,6 +103,26 @@ export function activate(context: vscode.ExtensionContext) {
 		showColorPicker();
 	});
 
+	// Switch style command
+	const switchStyleDisposable = vscode.commands.registerCommand(COMMANDS.SWITCH_STYLE, async () => {
+		const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+		const currentStyle = config.get('style') || 'modern';
+		const newStyle = currentStyle === 'modern' ? 'basic' : 'modern';
+		
+		await config.update('style', newStyle, vscode.ConfigurationTarget.Global);
+		
+		// Refresh preview if active
+		if (activePanel && activeReadmeUri) {
+			const readmeContent = await vscode.workspace.fs.readFile(activeReadmeUri);
+			const markdownString = new TextDecoder().decode(readmeContent);
+			updateWebViewContent(activePanel, markdownString);
+		}
+		
+		updateStyleStatusBarText();
+		
+		vscode.window.showInformationMessage(`Switched to ${newStyle} style!`);
+	});
+
 	// Refresh preview command (called by color picker)
 	const refreshPreviewDisposable = vscode.commands.registerCommand(COMMANDS.REFRESH_PREVIEW, async () => {
 		if (activePanel && activeReadmeUri) {
@@ -107,7 +132,30 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 	
-	context.subscriptions.push(helloWorldDisposable, previewDisposable, colorPickerDisposable, refreshPreviewDisposable);
+	context.subscriptions.push(helloWorldDisposable, previewDisposable, colorPickerDisposable, switchStyleDisposable, refreshPreviewDisposable);
+}
+
+/**
+ * Creates the status bar item for the style switcher
+ */
+function createStyleStatusBarItem(context: vscode.ExtensionContext): void {
+	styleStatusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 150);
+	styleStatusBarItem.command = COMMANDS.SWITCH_STYLE;
+	updateStyleStatusBarText();
+	styleStatusBarItem.show();
+	context.subscriptions.push(styleStatusBarItem);
+}
+
+/**
+ * Updates the style status bar text based on current configuration
+ */
+function updateStyleStatusBarText(): void {
+	if (styleStatusBarItem) {
+		const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+		const currentStyle = config.get('style') || 'modern';
+		styleStatusBarItem.text = currentStyle === 'modern' ? '🎨 Modern' : '📝 Basic';
+		styleStatusBarItem.tooltip = `Current style: ${currentStyle}. Click to switch to ${currentStyle === 'modern' ? 'basic' : 'modern'} style.`;
+	}
 }
 
 /**
